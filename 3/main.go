@@ -28,10 +28,16 @@ func main() {
 
 	intersections := make([]point, 0)
 
+	wireAsteps := 0
+	closestSteps := 0
+	var closestStepsPoint point
 	for i := 0; i < len(wires[0])-1; i++ {
 		pointA := wires[0][i]
+		wireAStart := pointA
 		pointB := wires[0][i+1]
 		segA := segment{pointA, pointB}
+
+		wireBsteps := 0
 
 		for x := 0; x < len(wires[1])-1; x++ {
 			pointA := wires[1][x]
@@ -40,10 +46,25 @@ func main() {
 
 			intersection := getIntersection(segA, segB)
 			if intersection != nil {
+				totalSteps := wireAsteps + wireBsteps
+				finalStepsA := int(math.Abs(float64(wireAStart.x-intersection.x)) + math.Abs(float64(wireAStart.y-intersection.y)))
+				finalStepsB := int(math.Abs(float64(pointA.x-intersection.x)) + math.Abs(float64(pointA.y-intersection.y)))
+				totalSteps += finalStepsA + finalStepsB
+				fmt.Printf("Final A steps: %d\nFinal B steps: %d\n", finalStepsA, finalStepsB)
+				if closestSteps == 0 || closestSteps > totalSteps {
+					closestSteps = totalSteps
+					closestStepsPoint = *intersection
+				}
 				intersections = append(intersections, *intersection)
 			}
+			steps := int(math.Abs(float64(pointA.x-pointB.x)) + math.Abs(float64(pointA.y-pointB.y)))
+			wireBsteps += steps
 		}
+		steps := int(math.Abs(float64(pointA.x-pointB.x)) + math.Abs(float64(pointA.y-pointB.y)))
+		// fmt.Printf("Steps between points %s and %s: %d\n", pointA, pointB, steps)
+		wireAsteps += steps
 	}
+	fmt.Printf("Closest steps %d at point %s.\n", closestSteps, closestStepsPoint)
 
 	var closest point
 	closestDistance := 0
@@ -72,6 +93,8 @@ func graph(wire []string) []point {
 	var x, y int
 
 	points := make([]point, 0)
+	start := point{0, 0}
+	points = append(points, start)
 	for _, i := range wire {
 		dir := string(i[0])
 		distance, err := strconv.Atoi(i[1:])

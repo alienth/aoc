@@ -65,25 +65,8 @@ func execute(input []int) int {
 	for pos := 0; pos <= last; {
 		// fmt.Println("At position ", pos)
 		switch instruction := processInstruction(input[pos]); instruction.opcode {
-		case OpcodeAdd: // 3 params
-			fmt.Printf("Instruction: %v\n", input[pos:pos+4])
-			params := input[pos+1 : pos+3]
-			paramValues := getParamValues(input, instruction.paramModes, params)
-			operands := paramValues[:len(paramValues)]
-			store := input[pos+3]
-			result := add(operands)
-			fmt.Printf("Adding %v and storing sum %d at address %d.\n", operands, result, store)
-			input[store] = result
-			pos += 4
-		case OpcodeMultiply: // 3 params
-			fmt.Printf("Instruction: %v\n", input[pos:pos+4])
-			params := input[pos+1 : pos+3]
-			paramValues := getParamValues(input, instruction.paramModes, params)
-			operands := paramValues[:len(paramValues)]
-			store := input[pos+3]
-			result := multiply(operands)
-			fmt.Printf("Multiplying %v and storing product %d at address %d.\n", operands, result, store)
-			input[store] = result
+		case OpcodeAdd, OpcodeMultiply: // 3 params
+			math(input, pos, instruction)
 			pos += 4
 		case OpcodeInput:
 			fmt.Printf("Instruction: %v\n", input[pos:pos+2])
@@ -92,7 +75,8 @@ func execute(input []int) int {
 			pos += 2
 		case OpcodeOutput:
 			fmt.Printf("Instruction: %v\n", input[pos:pos+2])
-			fmt.Println("Output: ", input[input[pos+1]])
+			paramValues := getParamValues(input, instruction.paramModes, []int{input[pos+1]})
+			fmt.Println("Output: ", paramValues[0])
 			pos += 2
 		case OpcodeEnd:
 			return input[0]
@@ -101,6 +85,25 @@ func execute(input []int) int {
 		}
 	}
 	return 0
+}
+
+func math(input []int, pos int, ins instruction) {
+	fmt.Printf("Instruction: %v\n", input[pos:pos+4])
+	params := input[pos+1 : pos+3]
+	paramValues := getParamValues(input, ins.paramModes, params)
+	store := input[pos+3]
+	result := 0
+
+	switch ins.opcode {
+	case OpcodeAdd:
+		result = add(paramValues)
+		fmt.Printf("Adding %v and storing sum %d at address %d.\n", paramValues, result, store)
+	case OpcodeMultiply:
+		result = multiply(paramValues)
+		fmt.Printf("Multiplying %v and storing product %d at address %d.\n", paramValues, result, store)
+	}
+
+	input[store] = result
 }
 
 func add(operands []int) int {
@@ -112,11 +115,7 @@ func add(operands []int) int {
 }
 
 func multiply(operands []int) int {
-	product := 0
-	for _, o := range operands {
-		product = product * o
-	}
-	return product
+	return operands[0] * operands[1]
 }
 
 type instruction struct {

@@ -69,6 +69,9 @@ func main() {
 					fmt.Println("Storing last output signal from E, ", inputSignal)
 					lastOutputSignal = inputSignal
 				}
+				if halted {
+					break
+				}
 			}
 		}
 		fmt.Println("halted! ", lastOutputSignal)

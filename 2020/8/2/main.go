@@ -37,7 +37,7 @@ func main() {
 		newInst := make([]string, len(inst))
 
 		if it == "nop" {
-			if num == x {
+			if num == 0 {
 				continue
 			}
 

@@ -25,10 +25,9 @@ func main() {
 
 	sum := 0
 	for _, line := range lines {
-		split := strings.Split(line, "")
 		var compartments []string
-		compartments = append(compartments, line[0:len(split)/2])
-		compartments = append(compartments, line[len(split)/2:len(split)])
+		compartments = append(compartments, line[0:len(line)/2])
+		compartments = append(compartments, line[len(line)/2:len(line)])
 
 		for _, c := range strings.Split(compartments[0], "") {
 			if strings.Index(compartments[1], c) != -1 {
